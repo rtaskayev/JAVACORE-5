@@ -38,38 +38,31 @@ public class Main {
         DocumentBuilder builder = factory.newDocumentBuilder();
         Document doc = builder.parse(new File(fileName));
         Node root = doc.getDocumentElement();
+
         System.out.println("Root element: " + root.getNodeName());
-        list = read(root, list);
 
-        return list;
-    }
+        NodeList nodeList = doc.getElementsByTagName("employee");
+        for (int temp = 0; temp < nodeList.getLength(); temp++) {
+            Node node = nodeList.item(temp);
+            if (node.getNodeType() == Node.ELEMENT_NODE) {
+                Element element = (Element) node;
+                System.out.println("Current Element :" + node.getNodeName());
 
-    // Method to read xml document and parse into list of objects
-    private static List<Employee> read(Node node, List<Employee> empList) {
+                // get text
+                long id = Long.parseLong(element.getElementsByTagName("id").item(0).getTextContent());
+                String firstname = element.getElementsByTagName("firstName").item(0).getTextContent();
+                String lastname = element.getElementsByTagName("lastName").item(0).getTextContent();
+                String country = element.getElementsByTagName("country").item(0).getTextContent();
+                int age = Integer.parseInt(element.getElementsByTagName("age").item(0).getTextContent());
 
-        NodeList nodeList = node.getChildNodes();
-        List<Employee> list = empList;
-        Map<String, String> map_ = new HashMap<>();
+                System.out.println("id : " + id);
+                System.out.println("First Name : " + firstname);
+                System.out.println("Last Name : " + lastname);
+                System.out.println("Country : " + country);
+                System.out.println("Age : " + age);
 
-        for (int i = 0; i < nodeList.getLength(); i++) {
-            Node node_ = nodeList.item(i);
-            if (Node.ELEMENT_NODE == node_.getNodeType()) {
-                System.out.println("Name: " + node_.getNodeName());
-                Element element = (Element) node_;
-                NamedNodeMap map = element.getAttributes();
-                // Checking if node is employee and it has at least 1 value inside
-                if (node_.getNodeName().equals("employee") && map.getLength() > 0) {
-                    for (int a = 0; a < map.getLength(); a++) {
-                        String attrName = map.item(a).getNodeName();
-                        String attrValue = map.item(a).getNodeValue();
-                        System.out.println("Attribute: " + attrName + "; value: " + attrValue);
-                        map_.put(attrName, attrValue); // Inserting data into map
-                    }
-                    Employee emp = new Employee(map_); // Creating new employee object from created map
-                    list.add(emp);
-                    map_.clear();
-                }
-                read(node_, list);
+                Employee emp = new Employee(id, firstname, lastname, country, age);
+                list.add(emp);
             }
         }
         return list;
